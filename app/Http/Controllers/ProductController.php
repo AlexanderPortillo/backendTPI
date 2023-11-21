@@ -14,6 +14,7 @@ class ProductController extends Controller
      */
     public function index()
     {
+        // Mostramos todos los productos de la db
         return Product::all();
     }
 
@@ -37,12 +38,12 @@ class ProductController extends Controller
     {
         $inputs = $request->input();
 
-        // Tranformamos la primer letra del product_name en mayuscula
+        // Transformamos la primer letra de cada palabra del product_name en mayuscula
         if (isset($inputs['product_name']) && is_string($inputs['product_name'])) {
-            $inputs['product_name'] = ucfirst($inputs['product_name']);
+            $inputs['product_name'] = ucwords($inputs['product_name']);
         }
 
-        // Tranformamos la primer letra de category en mayuscula
+        // Transformamos la primer letra de category en mayuscula
         if (isset($inputs['category']) && is_string($inputs['category'])) {
             $inputs['category'] = ucfirst($inputs['category']);
         }
@@ -58,10 +59,10 @@ class ProductController extends Controller
         }
 
         // Creamos el producto si no hay duplicados
-        $p = Product::create($inputs);
+        $product = Product::create($inputs);
 
         return response()->json([
-            'data' => $p,
+            'data' => $product,
             'mensaje' => 'Producto creado con éxito',
         ]);
     }
@@ -74,17 +75,17 @@ class ProductController extends Controller
      */
     public function show($value)
     {
-        $p = null;
+        $id = null;
         $products = null;
 
         switch (true) {
             case is_numeric($value):
                 // Buscamos por ID un producto de la db
-                $p = Product::find($value);
+                $id = Product::find($value);
                 break;
 
-                // Buscamos por la category un producto, si hay mas de un producto
-                // con esta categoria nos muetras todas las coincidencias
+            // Buscamos por la category un producto, si hay mas de un producto
+            // con esta categoria nos muetras todas las coincidencias
             case is_string($value):
                 $products = Product::where('category', $value)->get();
 
@@ -104,9 +105,9 @@ class ProductController extends Controller
                 ]);
         }
 
-        if ($p !== null) {
+        if ($id !== null) {
             return response()->json([
-                'data' => $p,
+                'data' => $id,
                 'mensaje' => 'Producto encontrado con éxito',
             ]);
         } elseif ($products !== null && $products->count() > 0) {
@@ -172,7 +173,7 @@ class ProductController extends Controller
             $p->category = $newCategory;
         }
 
-        // Actualizar los demás campos
+        // Actualizamos los demás campos o los dejamos como estan
         $p->product_image = $request->input('product_image');
         $p->supplier = $request->input('supplier');
         $p->stock = $request->input('stock');
@@ -180,6 +181,7 @@ class ProductController extends Controller
         $p->price = $request->input('price');
         $p->description = $request->input('description');
 
+        // Guardamos la informacion
         if ($p->save()) {
             return response()->json([
                 'data' => $p,
@@ -201,6 +203,7 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
+        // Buscamos un producto por el id
         $p = Product::find($id);
         if (isset($p)) {
             $res = Product::destroy($id);

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,4 +28,12 @@ Route::controller(ProductController::class)->group(function () {
     Route::post('/product/create', 'store')->name('product.store');
     Route::put('/product/update/{id}', 'update')->name('product.update');
     Route::delete('/product/delete/{id}', 'destroy')->name('product.delete');
+});
+
+Route::controller(UserController::class)->group(function () {
+    Route::get('/users', 'index')->name('users.all');
+    Route::get('/user/search/{value}', 'show')->name('user.one');
+    Route::post('/user/create', 'store')->name('user.store');
+    Route::put('/user/update/{id}', 'update')->name('user.update');
+    Route::delete('/user/delete/{id}', 'destroy')->name('user.delete');
 });

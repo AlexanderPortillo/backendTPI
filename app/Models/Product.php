@@ -9,16 +9,18 @@ class Product extends Model
 {
     use HasFactory;
     protected $fillable = [
-        "id",
-        "product_name",
-        "category",
-        "product_image",
-        "supplier",
-        "stock",
-        "cost",
-        "price",
-        "description",
-        "created_at",
-        "updated_at",
+        'product_name',
+        'category',
+        'product_image',
+        'supplier',
+        'stock',
+        'cost',
+        'price',
+        'description',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 }
