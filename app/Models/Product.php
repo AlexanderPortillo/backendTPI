@@ -19,6 +19,10 @@ class Product extends Model
         'description',
     ];
 
+    protected $hidden = [
+        // 'id',
+    ];
+
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

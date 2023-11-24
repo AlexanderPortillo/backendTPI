@@ -33,6 +33,9 @@ class UserFactory extends Factory
             'rol' => 0,
             // 'rol' => $this->faker->numberBetween(0, 1),
             'referral_link' => Str::slug($user_name . $first_name . Str::random(6)),
+            'money_reffer' => 0,
+            'discount_percentage' => 15,
+            'remember_token' => Str::random(10),
         ];
     }
 }

@@ -23,11 +23,15 @@ class User extends Model
         'shipping_address',
         'rol',
         'referral_link',
+        'money_reffer',
+        'discount_percentage',
+        'remember_token',
     ];
 
     protected $hidden = [
         'rol',
         'password',
+        'remember_token',
     ];
 
     protected $casts = [

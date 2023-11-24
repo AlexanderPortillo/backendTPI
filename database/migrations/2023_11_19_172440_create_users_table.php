@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -28,6 +27,9 @@ return new class extends Migration
             $table->string('shipping_address');
             $table->string('rol');
             $table->string('referral_link')->nullable();
+            $table->decimal('money_reffer')->nullable();
+            $table->decimal('discount_percentage', 5, 2);
+            $table->rememberToken();
             $table->timestamps();
         });
     }

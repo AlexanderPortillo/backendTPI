@@ -58,6 +58,12 @@ class ProductController extends Controller
             ]);
         }
 
+        $defaultImg = 'default.jpg';
+
+        if(!isset($inputs['product_image'])) {
+            $inputs['product_image'] = $defaultImg;
+        }
+
         // Creamos el producto si no hay duplicados
         $product = Product::create($inputs);
 
@@ -73,55 +79,81 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($value)
+    public function show($id)
     {
-        $id = null;
-        $products = null;
-
-        switch (true) {
-            case is_numeric($value):
-                // Buscamos por ID un producto de la db
-                $id = Product::find($value);
-                break;
-
-            // Buscamos por la category un producto, si hay mas de un producto
-            // con esta categoria nos muetras todas las coincidencias
-            case is_string($value):
-                $products = Product::where('category', $value)->get();
-
-                // Buscar por product_name
-                // $p = Product::where('product_name', $value)->first();
-
-                // Si no se encontró por product_name, buscar por category
-                // if (!$p) {
-                //     $products = Product::where('category', $value)->get();
-                // }
-                break;
-
-            default:
-                return response()->json([
-                    'error' => true,
-                    'mensaje' => 'Parámetro no válido. Se espera un ID numérico, un product_name o un category.',
-                ]);
+        // Validación de entrada
+        if (!is_numeric($id) || $id <= 0) {
+            return response()->json(['error' => 'El ID debe ser un número entero positivo'], 400);
         }
 
-        if ($id !== null) {
-            return response()->json([
-                'data' => $id,
-                'mensaje' => 'Producto encontrado con éxito',
-            ]);
-        } elseif ($products !== null && $products->count() > 0) {
-            return response()->json([
-                'data' => $products,
-                'mensaje' => 'Productos encontrados con éxito',
-            ]);
-        } else {
-            return response()->json([
-                'error' => true,
-                'mensaje' => 'No existen productos con el criterio de búsqueda proporcionado.',
-            ]);
+        // Buscar producto por ID
+        $product = Product::find($id);
+
+        // Verifica si se encontró el producto
+        if (!$product) {
+            return response()->json(['error' => 'No se encontró un producto con el ID proporcionado'], 404);
         }
+
+        return response()->json($product);
     }
+
+    public function showCategory($category)
+    {
+        // Validación de entrada
+        if (!is_string($category)) {
+            return response()->json(['error' => 'El valor debe ser una cadena de texto'], 400);
+        }
+
+        // Filtra los productos por categoria
+        $products = Product::where('category', $category)->get();
+
+        // Verifica si se encontraron productos
+        if ($products->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron productos con la categoria proporcionada'], 404);
+        }
+
+        return response()->json($products);
+    }
+
+    public function showRangePrice($inicio, $final)
+    {
+        // Validación de entrada
+        if (!is_numeric($inicio) || !is_numeric($final)) {
+            return response()->json(['error' => 'Los valores deben ser numéricos'], 400);
+        }
+
+        // Convierte los valores de inicio y final a números flotantes
+        $inicio = floatval($inicio);
+        $final = floatval($final);
+
+        // Filtra los productos dentro del rango de precio
+        $products = Product::whereBetween('price', [$inicio, $final])->get();
+
+        if ($products->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron productos en el rango proporcionado'], 404);
+        }
+
+        return response()->json($products);
+    }
+
+    public function showNameProduct($productName)
+    {
+        // Validación de entrada
+        if (!is_string($productName)) {
+            return response()->json(['error' => 'El valor debe ser una cadena de texto'], 400);
+        }
+
+        // Filtra los productos por nombre de manera flexible
+        $products = Product::where('product_name', 'LIKE', "%$productName%")->get();
+
+        // Verifica si se encontraron productos
+        if ($products->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron productos con el nombre proporcionado'], 404);
+        }
+
+        return response()->json($products);
+    }
+
 
     /**
      * Show the form for editing the specified resource.
